@@ -6,7 +6,7 @@
 /*   By: eiglesia <eiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 18:00:56 by eiglesia          #+#    #+#             */
-/*   Updated: 2025/04/29 16:41:00 by eiglesia         ###   ########.fr       */
+/*   Updated: 2025/05/01 00:13:47 by eiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,6 @@
 
 char	*get_next_line(int fd);
 
-typedef struct s_list
-{
-	char			*content;
-	int				fd;
-	struct s_list	*next;
-	struct s_list	*prev;
-}	t_list;
 
 
 
