@@ -1,0 +1,3 @@
+Another file for bonus testing.
+This one also has a line that is longer than a typical buffer size to check multi-read concatenation. This is the second line of test2.txt and it is very long.
+End of test2.

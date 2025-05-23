@@ -1,0 +1,5 @@
+Hello world
+This is a test
+Line with 	 tabs and spaces
+A very long line that definitely exceeds BUFFER_SIZE if BUFFER_SIZE is small, let's make it longer just in case to ensure it spans multiple reads. This line is intentionally very very long for testing purposes.
+Short
