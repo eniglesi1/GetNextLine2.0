@@ -6,160 +6,107 @@
 /*   By: eiglesia <eiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 18:00:59 by eiglesia          #+#    #+#             */
-/*   Updated: 2025/05/01 02:16:12 by eiglesia         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:47:20 by eiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <limits.h>
 
-size_t	ft_strlen(const char *s)
+static void	*ft_calloc(size_t nmemb, size_t size)
 {
-	size_t	i;
+	void	*a;
+	int		n;
 
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
-size_t	ft_strlcpy(char *dst, const char *src, size_t size)
-{
-	size_t	a;
-
-	if (!dst || !src)
-		return (0);
-	if (size == 0)
-		return (ft_strlen(src));
-	a = 0;
-	while (a < (size - 1) && src[a] != '\0')
-	{
-		dst[a] = src[a];
-		a++;
-	}
-	dst[a] = '\0';
-	return (ft_strlen(src));
-}
-
-size_t	ft_strlcat(char *dst, const char *src, size_t size)
-{
-	size_t	a;
-	size_t	i;
-
-	a = 0;
-	i = 0;
-	while (dst[a] != '\0' && a < size)
-		a++;
-	if (size > a)
-		size = (size - a) - 1;
-	else
-		return (size + ft_strlen(src));
-	while (size > 0 && src[i] != '\0')
-	{
-		dst[a] = src[i];
-		a++;
-		i++;
-		size--;
-	}
-	dst[a] = '\0';
-	return (ft_strlen(dst) + ft_strlen(src) - i);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
+	n = nmemb * size;
+	a = malloc(nmemb * size + 1);
+	if (!a)
+		return (NULL);
 	while (n > 0)
 	{
 		n--;
-		((unsigned char *)s)[n] = '\0';
+		((char *)a)[n] = '\0';
 	}
-}
-
-void	*ft_calloc(size_t nmemb, size_t size)
-{
-	void	*a;
-
-	if (nmemb != 0 && (nmemb * size) / nmemb != size)
-		return (NULL);
-	a = malloc(nmemb * size);
-	if (!a)
-		return (NULL);
-	ft_bzero(a, nmemb * size);
 	return (a);
 }
 
-void	*ft_realloc(void *ptr, size_t size)
-{
-	char	*str;
-
-	if (ptr == NULL)
-		return (ft_calloc(size, sizeof(char)));
-	if (size == 0)
-		return (free(ptr), NULL);
-	str = ft_calloc(size, sizeof(char));
-	if (str == NULL)
-		return (free(ptr), NULL);
-	ft_strlcpy(str, ptr, size);
-	return (free(ptr), str);
-}
-
-int	isline(char *str)
+static int	find_nl(char *extra)
 {
 	int	i;
 
 	i = 0;
-	if (str == NULL)
-		return (0);
-	while (str[i] && str[i] != '\n')
+	while (extra[i] != '\n' && extra[i])
 		i++;
-	return (str[i] / 10);
+	if (extra[i] == '\n')
+		return (i);
+	return (-1);
 }
 
-char	*ft_strchr(const char *s, int c)
+static char	*clean_buffer(char *string, char *extra, int aux, int u)
 {
-	while (*s)
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	if (u == 1)
 	{
-		if (*s == (unsigned char)c)
-			return ((char *)s);
-		s++;
-	}
-	if (c == 0)
-		return ((char *)s);
-	return (NULL);
-}
-
-char	*read_ff(int fd, char **gnl)
-{
-	int		bytes_readed;
-	char	*string;
-
-	bytes_readed = 1;
-	string = malloc(sizeof(char) * BUFFER_SIZE + 1);
-	if (string == NULL)
+		free(string);
 		return (NULL);
-	while (bytes_readed > 0 && isline(gnl[0]) == 0)
-	{
-		bytes_readed = read(fd, gnl[0], BUFFER_SIZE);
-		string = ft_realloc(string, ft_strlen(string) + ft_strlen(gnl[0]) + 1);
-		if (string == NULL)
-			return (NULL);
-		ft_strlcat(string, gnl[0], ft_strlen(string) + ft_strlen(gnl[0]) + 1);
 	}
-	if (gnl[0] && isline(gnl[0]) == 1)
-		ft_strlcpy(gnl[0], ft_strchr(gnl[0], '\n') + 1, ft_strlen(ft_strchr(gnl[0], '\n') + 1));
-	return (string);
+	if (extra)
+	{
+		while (extra[i] != '\n' && extra[i])
+			i++;
+		while ((&extra[i + 1])[j] != '\0')
+			j++;
+		if (extra[i] == '\n')
+		{
+			ft_strlcpy(extra, &extra[i + 1], j + 1);
+			string[aux] = '\n';
+		}
+		else if (!extra[i])
+			extra[0] = 0;
+	}
+	return (ft_realloc(string, 0));
 }
 
+static int	repet(char *string, char *extra)
+{
+	int	aux;
 
+	aux = 0;
+	while (extra[aux] != '\n' && extra[aux])
+	{
+		string[aux] = extra[aux];
+		aux++;
+	}
+	return (aux);
+}
 
 char	*get_next_line(int fd)
 {
-	static char	gnl[FOPEN_MAX][BUFFER_SIZE + 1];
-	char		*string;
+	char			*string;
+	static char		extra[BUFFER_SIZE + 1];
+	int				baits;
+	int				aux;
 
-	if (fd < 0 || BUFFER_SIZE > SSIZE_MAX)
-		return (NULL);
-	if (!gnl[fd] || isline(gnl[fd]) == 0)
-		string = read_ff(fd, &(gnl[fd]));
+	string = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (string == NULL)
 		return (NULL);
-	return (extract_line(string));
+	aux = repet(string, extra);
+	if (extra[aux])
+		return (clean_buffer(string, extra, aux, 0));
+	while (find_nl(extra) == -1)
+	{
+		baits = read_buffer_fd(fd, extra);
+		if (baits == 0)
+			break ;
+		string = ft_realloc(string, baits);
+		if (string == NULL || extra[0] == 0)
+			return (clean_buffer(string, extra, aux, 1));
+		aux = ft_copynl(extra, baits, string, aux);
+	}
+	if (baits == 0 && !string[0])
+		return (clean_buffer(string, extra, aux, 1));
+	return (clean_buffer(string, extra, aux, 0));
 }
