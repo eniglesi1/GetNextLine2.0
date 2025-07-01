@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: eiglesia <eiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/23 18:01:18 by eiglesia          #+#    #+#             */
-/*   Updated: 2025/05/28 17:46:29 by eiglesia         ###   ########.fr       */
+/*   Created: 2022/02/16 21:47:56 by eiglesia          #+#    #+#             */
+/*   Updated: 2025/07/01 17:54:24 by eiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,19 @@
 # include <stddef.h>
 # include <stdio.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
+
+# ifndef OPEN_MAX
+#  define OPEN_MAX 128
+# endif
+
 char	*get_next_line(int fd);
-char	*ft_realloc(char *s1, int i);
+char	*ft_realloc(char *s1, int i, int len);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 int		ft_copynl(char *extra, int baits, char *string, int aux);
-int		read_buffer_fd(int fd, char *extra);
+int		leer(int fd, char *extra);
+int		ft_is_line(char *extra, int len);
 
 #endif
